@@ -1,0 +1,6 @@
+EmployeeNo,Name,Email,Department,Position,Role
+LEG-2001,한레거시,legacy.han@intraflow.local,Creative Tech,Designer,Employee
+LEG-2002,오운영,ops.oh@intraflow.local,IT Platform,Operator,Manager
+LEG-2003,문데이터,bad-email,Data Office,Analyst,Employee
+,누락직원,missing.no@intraflow.local,Creative Tech,Developer,Employee
+IF-0003,중복직원,duplicate@intraflow.local,Creative Tech,Developer,Employee

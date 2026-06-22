@@ -1,0 +1,25 @@
+@baseUrl = https://localhost:7254
+@token = paste-jwt-token-here
+
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@intraflow.local",
+  "password": "Admin123!"
+}
+
+###
+
+GET {{baseUrl}}/api/dashboard
+Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/api/erp-sync/run
+Authorization: Bearer {{token}}
+
+###
+
+POST {{baseUrl}}/api/legacy-import/sample
+Authorization: Bearer {{token}}

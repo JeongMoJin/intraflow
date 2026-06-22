@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="IntraFlow.Api/IntraFlow.Api.csproj" />
+  <Project Path="IntraFlow.Tests/IntraFlow.Tests.csproj" />
+</Solution>
