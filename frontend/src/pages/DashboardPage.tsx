@@ -4,11 +4,13 @@ import DataGrid, { Column, Paging } from 'devextreme-react/data-grid';
 import { Activity, DatabaseZap, FileText, ListChecks, Users } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileInsightList, MobileRecordList } from '../components/MobileViews';
 import { PageHeader } from '../components/PageHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { translateStatus, useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { DashboardSummary } from '../types/api';
+import { formatDateTime } from '../utils/format';
 
 const copy: Record<Language, {
   heroEyebrow: string;
@@ -124,6 +126,7 @@ export function DashboardPage() {
     () => (summary?.approvalsByStatus ?? []).map((item) => ({ ...item, label: translateStatus(item.label, language) })),
     [language, summary?.approvalsByStatus],
   );
+  const projectChart = summary?.projectsByDepartment ?? [];
 
   return (
     <>
@@ -155,26 +158,36 @@ export function DashboardPage() {
             <span className="eyebrow">{t.projectDistribution}</span>
             <h2>{t.projectsByDepartment}</h2>
           </div>
-          <Chart dataSource={summary?.projectsByDepartment ?? []} height={280} palette={['#4bd3ff']}>
-            <ArgumentAxis argumentType="string" />
-            <ValueAxis />
-            <Series argumentField="label" valueField="count" type="bar" />
-            <Tooltip enabled />
-            <Legend visible={false} />
-          </Chart>
+          <div className="desktop-chart">
+            <Chart dataSource={projectChart} height={280} palette={['#4bd3ff']}>
+              <ArgumentAxis argumentType="string" />
+              <ValueAxis />
+              <Series argumentField="label" valueField="count" type="bar" />
+              <Tooltip enabled />
+              <Legend visible={false} />
+            </Chart>
+          </div>
+          <div className="mobile-chart">
+            <MobileInsightList emptyText={t.noData} items={projectChart.map((item) => ({ id: item.label, label: item.label, value: item.count }))} />
+          </div>
         </section>
         <section className="panel chart-panel">
           <div className="section-title">
             <span className="eyebrow">{t.approvalFlow}</span>
             <h2>{t.approvalsByStatus}</h2>
           </div>
-          <Chart dataSource={approvalChart} height={280} palette={['#8f7cff']}>
-            <ArgumentAxis argumentType="string" />
-            <ValueAxis />
-            <Series argumentField="label" valueField="count" type="bar" />
-            <Tooltip enabled />
-            <Legend visible={false} />
-          </Chart>
+          <div className="desktop-chart">
+            <Chart dataSource={approvalChart} height={280} palette={['#8f7cff']}>
+              <ArgumentAxis argumentType="string" />
+              <ValueAxis />
+              <Series argumentField="label" valueField="count" type="bar" />
+              <Tooltip enabled />
+              <Legend visible={false} />
+            </Chart>
+          </div>
+          <div className="mobile-chart">
+            <MobileInsightList emptyText={t.noData} items={approvalChart.map((item) => ({ id: item.label, label: item.label, value: item.count }))} />
+          </div>
         </section>
       </div>
 
@@ -184,26 +197,60 @@ export function DashboardPage() {
             <span className="eyebrow">{t.erpHealth}</span>
             <h2>{t.recentErpSync}</h2>
           </div>
-          <DataGrid dataSource={summary?.recentErpSyncs ?? []} showBorders columnAutoWidth>
-            <Paging defaultPageSize={5} />
-            <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-            <Column dataField="importedCount" caption={t.columns.imported} />
-            <Column dataField="failedCount" caption={t.columns.failed} />
-            <Column dataField="message" caption={t.columns.message} />
-          </DataGrid>
+          <div className="desktop-data-grid">
+            <DataGrid dataSource={summary?.recentErpSyncs ?? []} showBorders columnAutoWidth>
+              <Paging defaultPageSize={5} />
+              <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+              <Column dataField="importedCount" caption={t.columns.imported} />
+              <Column dataField="failedCount" caption={t.columns.failed} />
+              <Column dataField="message" caption={t.columns.message} />
+            </DataGrid>
+          </div>
+          <div className="mobile-data-list">
+            <MobileRecordList
+              emptyText={t.noData}
+              items={(summary?.recentErpSyncs ?? []).map((log) => ({
+                id: log.id,
+                title: log.message,
+                status: <StatusBadge value={log.status} />,
+                meta: [
+                  { label: t.columns.imported, value: log.importedCount },
+                  { label: t.columns.failed, value: log.failedCount },
+                  { label: t.columns.created, value: formatDateTime(log.startedAt, language) },
+                ],
+              }))}
+            />
+          </div>
         </section>
         <section className="panel table-panel">
           <div className="section-title">
             <span className="eyebrow">{t.auditReady}</span>
             <h2>{t.recentActivity}</h2>
           </div>
-          <DataGrid dataSource={summary?.recentAuditLogs ?? []} showBorders columnAutoWidth>
-            <Paging defaultPageSize={5} />
-            <Column dataField="action" caption={t.columns.action} />
-            <Column dataField="entityName" caption={t.columns.entity} />
-            <Column dataField="userName" caption={t.columns.user} />
-            <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
-          </DataGrid>
+          <div className="desktop-data-grid">
+            <DataGrid dataSource={summary?.recentAuditLogs ?? []} showBorders columnAutoWidth>
+              <Paging defaultPageSize={5} />
+              <Column dataField="action" caption={t.columns.action} />
+              <Column dataField="entityName" caption={t.columns.entity} />
+              <Column dataField="userName" caption={t.columns.user} />
+              <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
+            </DataGrid>
+          </div>
+          <div className="mobile-data-list">
+            <MobileRecordList
+              emptyText={t.noData}
+              items={(summary?.recentAuditLogs ?? []).map((log) => ({
+                id: log.id,
+                eyebrow: log.entityName,
+                title: log.action,
+                description: log.userName,
+                meta: [
+                  { label: t.columns.user, value: log.userName },
+                  { label: t.columns.created, value: formatDateTime(log.createdAt, language) },
+                ],
+              }))}
+            />
+          </div>
         </section>
       </div>
     </>

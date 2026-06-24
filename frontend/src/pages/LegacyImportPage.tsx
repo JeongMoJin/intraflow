@@ -3,12 +3,14 @@ import DataGrid, { Column, Paging } from 'devextreme-react/data-grid';
 import { FileClock, FileWarning, UploadCloud } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { Notice } from '../components/Notice';
 import { PageHeader } from '../components/PageHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { LegacyImportLog, LegacyImportResult } from '../types/api';
+import { formatDateTime } from '../utils/format';
 
 const copy: Record<Language, {
   title: string;
@@ -94,6 +96,7 @@ const copy: Record<Language, {
 export function LegacyImportPage() {
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyLogs = language === 'ko' ? '실패 로그가 없습니다.' : 'No failure logs.';
   const [logs, setLogs] = useState<LegacyImportLog[]>([]);
   const [message, setMessage] = useState('');
 
@@ -169,16 +172,35 @@ export function LegacyImportPage() {
           <span className="eyebrow">{t.migrationStatus}</span>
           <h2>{t.failureLog}</h2>
         </div>
-        <DataGrid dataSource={logs} showBorders columnAutoWidth>
-          <Paging defaultPageSize={10} />
-          <Column dataField="fileName" caption={t.columns.file} />
-          <Column dataField="rowNumber" caption={t.columns.row} />
-          <Column dataField="employeeNo" caption={t.columns.employeeNo} />
-          <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-          <Column dataField="message" caption={t.columns.message} />
-          <Column dataField="rawValue" caption={t.columns.raw} />
-          <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={logs} showBorders columnAutoWidth>
+            <Paging defaultPageSize={10} />
+            <Column dataField="fileName" caption={t.columns.file} />
+            <Column dataField="rowNumber" caption={t.columns.row} />
+            <Column dataField="employeeNo" caption={t.columns.employeeNo} />
+            <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+            <Column dataField="message" caption={t.columns.message} />
+            <Column dataField="rawValue" caption={t.columns.raw} />
+            <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyLogs}
+            items={logs.map((log) => ({
+              id: log.id,
+              eyebrow: `${t.columns.row} ${log.rowNumber}`,
+              title: log.message,
+              description: log.rawValue,
+              status: <StatusBadge value={log.status} />,
+              meta: [
+                { label: t.columns.file, value: log.fileName },
+                { label: t.columns.employeeNo, value: log.employeeNo ?? '-' },
+                { label: t.columns.created, value: formatDateTime(log.createdAt, language) },
+              ],
+            }))}
+          />
+        </div>
       </section>
     </>
   );

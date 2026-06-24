@@ -3,6 +3,7 @@ import DataGrid, { Column, FilterRow, Paging, SearchPanel } from 'devextreme-rea
 import { ShieldCheck, UserCog, Users } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { Notice } from '../components/Notice';
 import { PageHeader } from '../components/PageHeader';
 import { DataChip, RoleBadge, StatusBadge } from '../components/StatusBadge';
@@ -146,6 +147,7 @@ export function EmployeesPage() {
   const auth = useAuth();
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyDirectory = language === 'ko' ? '직원 데이터가 없습니다.' : 'No employee records.';
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [form, setForm] = useState({ ...emptyEmployee });
   const [selectedId, setSelectedId] = useState<number>();
@@ -198,6 +200,19 @@ export function EmployeesPage() {
     await load();
   }
 
+  function selectEmployee(data: Employee) {
+    setSelectedId(data.id);
+    setForm({
+      employeeNo: data.employeeNo,
+      name: data.name,
+      email: data.email.includes('***') ? '' : data.email,
+      department: data.department,
+      position: data.position,
+      role: data.role,
+      isActive: data.isActive,
+    });
+  }
+
   return (
     <>
       <PageHeader title={t.title} description={t.description} eyebrow={t.eyebrow} />
@@ -233,39 +248,55 @@ export function EmployeesPage() {
           <h2>{t.directoryTitle}</h2>
           <p>{auth.role === 'Admin' ? t.adminPrivacy : t.maskedPrivacy}</p>
         </div>
-        <DataGrid
-          dataSource={employees}
-          showBorders
-          columnAutoWidth
-          onRowClick={(event) => {
-            if (auth.role === 'Admin' && event.data) {
-              const data = event.data as Employee;
-              setSelectedId(data.id);
-              setForm({
-                employeeNo: data.employeeNo,
-                name: data.name,
-                email: data.email.includes('***') ? '' : data.email,
-                department: data.department,
-                position: data.position,
-                role: data.role,
-                isActive: data.isActive,
-              });
-            }
-          }}
-        >
-          <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
-          <FilterRow visible />
-          <Paging defaultPageSize={10} />
-          <Column dataField="employeeNo" caption={t.columns.employeeNo} />
-          <Column dataField="name" caption={t.columns.name} />
-          <Column dataField="email" caption={t.columns.email} cellRender={({ value }) => <span className={String(value).includes('***') ? 'masked-email' : ''}>{value}</span>} />
-          <Column dataField="department" caption={t.columns.department} cellRender={({ value }) => <DataChip value={value} />} />
-          <Column dataField="position" caption={t.columns.position} />
-          <Column dataField="role" caption={t.columns.role} cellRender={({ value }) => <RoleBadge role={value} />} />
-          <Column dataField="isActive" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-          <Column dataField="source" caption={t.columns.source} cellRender={({ value }) => <DataChip value={value} />} />
-          {auth.role === 'Admin' ? <Column caption={t.columns.action} cellRender={({ data }) => <button className="ghost-button" type="button" onClick={() => deactivate((data as Employee).id)}>{t.buttons.deactivate}</button>} /> : null}
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid
+            dataSource={employees}
+            showBorders
+            columnAutoWidth
+            onRowClick={(event) => {
+              if (auth.role === 'Admin' && event.data) {
+                selectEmployee(event.data as Employee);
+              }
+            }}
+          >
+            <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
+            <FilterRow visible />
+            <Paging defaultPageSize={10} />
+            <Column dataField="employeeNo" caption={t.columns.employeeNo} />
+            <Column dataField="name" caption={t.columns.name} />
+            <Column dataField="email" caption={t.columns.email} cellRender={({ value }) => <span className={String(value).includes('***') ? 'masked-email' : ''}>{value}</span>} />
+            <Column dataField="department" caption={t.columns.department} cellRender={({ value }) => <DataChip value={value} />} />
+            <Column dataField="position" caption={t.columns.position} />
+            <Column dataField="role" caption={t.columns.role} cellRender={({ value }) => <RoleBadge role={value} />} />
+            <Column dataField="isActive" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+            <Column dataField="source" caption={t.columns.source} cellRender={({ value }) => <DataChip value={value} />} />
+            {auth.role === 'Admin' ? <Column caption={t.columns.action} cellRender={({ data }) => <button className="ghost-button" type="button" onClick={() => deactivate((data as Employee).id)}>{t.buttons.deactivate}</button>} /> : null}
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyDirectory}
+            items={employees.map((employee) => ({
+              id: employee.id,
+              eyebrow: employee.employeeNo,
+              title: employee.name,
+              description: employee.email,
+              status: <StatusBadge value={employee.isActive} />,
+              meta: [
+                { label: t.columns.department, value: <DataChip value={employee.department} /> },
+                { label: t.columns.position, value: employee.position },
+                { label: t.columns.role, value: <RoleBadge role={employee.role} /> },
+                { label: t.columns.source, value: <DataChip value={employee.source} /> },
+              ],
+              actions: auth.role === 'Admin' ? (
+                <>
+                  <button className="ghost-button" type="button" onClick={() => selectEmployee(employee)}>{t.buttons.update}</button>
+                  <button className="danger-button" type="button" onClick={() => deactivate(employee.id)}>{t.buttons.deactivate}</button>
+                </>
+              ) : undefined,
+            }))}
+          />
+        </div>
       </section>
     </>
   );

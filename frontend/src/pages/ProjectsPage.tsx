@@ -3,6 +3,7 @@ import DataGrid, { Column, FilterRow, Paging, SearchPanel } from 'devextreme-rea
 import { Activity, CheckCircle2, PauseCircle, Wallet } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { Notice } from '../components/Notice';
 import { PageHeader } from '../components/PageHeader';
 import { DataChip, StatusBadge } from '../components/StatusBadge';
@@ -10,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { translateStatus, useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { Project } from '../types/api';
+import { formatMoney } from '../utils/format';
 
 interface ProjectForm {
   projectCode: string;
@@ -150,6 +152,7 @@ export function ProjectsPage() {
   const auth = useAuth();
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyProjects = language === 'ko' ? '프로젝트 데이터가 없습니다.' : 'No project records.';
   const [projects, setProjects] = useState<Project[]>([]);
   const [form, setForm] = useState({ ...emptyProject });
   const [selectedId, setSelectedId] = useState<number>();
@@ -197,6 +200,21 @@ export function ProjectsPage() {
 
   const canEdit = auth.role === 'Admin' || auth.role === 'Manager';
 
+  function selectProject(data: Project) {
+    setSelectedId(data.id);
+    setForm({
+      projectCode: data.projectCode,
+      name: data.name,
+      description: data.description,
+      department: data.department,
+      ownerEmployeeId: data.ownerEmployeeId,
+      status: data.status,
+      startDate: data.startDate ?? '',
+      endDate: data.endDate ?? '',
+      budget: data.budget,
+    });
+  }
+
   return (
     <>
       <PageHeader title={t.title} description={t.description} eyebrow={t.eyebrow} />
@@ -230,39 +248,48 @@ export function ProjectsPage() {
           <span className="eyebrow">{t.sectionEyebrow}</span>
           <h2>{t.sectionTitle}</h2>
         </div>
-        <DataGrid
-          dataSource={projects}
-          showBorders
-          columnAutoWidth
-          onRowClick={(event) => {
-            if (canEdit && event.data) {
-              const data = event.data as Project;
-              setSelectedId(data.id);
-              setForm({
-                projectCode: data.projectCode,
-                name: data.name,
-                description: data.description,
-                department: data.department,
-                ownerEmployeeId: data.ownerEmployeeId,
-                status: data.status,
-                startDate: data.startDate ?? '',
-                endDate: data.endDate ?? '',
-                budget: data.budget,
-              });
-            }
-          }}
-        >
-          <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
-          <FilterRow visible />
-          <Paging defaultPageSize={10} />
-          <Column dataField="projectCode" caption={t.columns.code} />
-          <Column dataField="name" caption={t.columns.project} />
-          <Column dataField="department" caption={t.columns.department} cellRender={({ value }) => <DataChip value={value} />} />
-          <Column dataField="ownerName" caption={t.columns.owner} />
-          <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-          <Column dataField="budget" caption={t.columns.budget} dataType="number" format="#,##0" />
-          <Column dataField="source" caption={t.columns.source} cellRender={({ value }) => <DataChip value={value} />} />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid
+            dataSource={projects}
+            showBorders
+            columnAutoWidth
+            onRowClick={(event) => {
+              if (canEdit && event.data) {
+                selectProject(event.data as Project);
+              }
+            }}
+          >
+            <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
+            <FilterRow visible />
+            <Paging defaultPageSize={10} />
+            <Column dataField="projectCode" caption={t.columns.code} />
+            <Column dataField="name" caption={t.columns.project} />
+            <Column dataField="department" caption={t.columns.department} cellRender={({ value }) => <DataChip value={value} />} />
+            <Column dataField="ownerName" caption={t.columns.owner} />
+            <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+            <Column dataField="budget" caption={t.columns.budget} dataType="number" format="#,##0" />
+            <Column dataField="source" caption={t.columns.source} cellRender={({ value }) => <DataChip value={value} />} />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyProjects}
+            items={projects.map((project) => ({
+              id: project.id,
+              eyebrow: project.projectCode,
+              title: project.name,
+              description: project.description,
+              status: <StatusBadge value={project.status} />,
+              meta: [
+                { label: t.columns.department, value: <DataChip value={project.department} /> },
+                { label: t.columns.owner, value: project.ownerName ?? '-' },
+                { label: t.columns.budget, value: `${formatMoney(project.budget, language)} KRW` },
+                { label: t.columns.source, value: <DataChip value={project.source} /> },
+              ],
+              actions: canEdit ? <button className="ghost-button" type="button" onClick={() => selectProject(project)}>{t.buttons.update}</button> : undefined,
+            }))}
+          />
+        </div>
       </section>
     </>
   );

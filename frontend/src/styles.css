@@ -387,6 +387,144 @@ html[lang="ko"] .language-switch button {
   -webkit-overflow-scrolling: touch;
 }
 
+.mobile-data-list,
+.mobile-chart {
+  display: none;
+}
+
+.desktop-data-grid,
+.desktop-chart {
+  display: block;
+}
+
+.mobile-empty-state {
+  border-top: 1px solid #e6e6e6;
+  padding: 16px 0 2px;
+  color: #777;
+  font-size: 14px;
+}
+
+.mobile-record-list {
+  display: grid;
+  gap: 0;
+}
+
+.mobile-record-item {
+  border-top: 1px solid #e6e6e6;
+  padding: 16px 0;
+}
+
+.mobile-record-item:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.mobile-record-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.mobile-record-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.mobile-record-item h3 {
+  margin: 0;
+  color: #2c2c2c;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.mobile-record-item p {
+  margin: 9px 0 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.mobile-record-status {
+  flex: 0 0 auto;
+}
+
+.mobile-record-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px 14px;
+  margin: 14px 0 0;
+}
+
+.mobile-record-meta div {
+  min-width: 0;
+}
+
+.mobile-record-meta dt {
+  margin: 0 0 4px;
+  color: #9a9a9a;
+  font-size: 11px;
+}
+
+.mobile-record-meta dd {
+  margin: 0;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.mobile-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.mobile-insight-list {
+  display: grid;
+  gap: 14px;
+}
+
+.mobile-insight-row {
+  display: grid;
+  gap: 7px;
+}
+
+.mobile-insight-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+  color: #555;
+  font-size: 13px;
+}
+
+.mobile-insight-label strong {
+  color: #222;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mobile-insight-track {
+  height: 6px;
+  background: #eeeeee;
+  overflow: hidden;
+}
+
+.mobile-insight-track span {
+  display: block;
+  height: 100%;
+  background: #111;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -1000,6 +1138,60 @@ button.primary,
   }
 }
 
+@media (max-width: 760px) {
+  .desktop-data-grid,
+  .desktop-chart {
+    display: none;
+  }
+
+  .mobile-data-list,
+  .mobile-chart {
+    display: block;
+  }
+
+  .table-panel {
+    overflow-x: visible;
+  }
+
+  .metrics,
+  .metrics.three,
+  .metrics.four,
+  .metrics.five {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .chart-panel,
+  .table-panel {
+    padding-top: 16px;
+  }
+
+  .content > .page-header {
+    order: 1;
+  }
+
+  .content > .metrics {
+    order: 2;
+  }
+
+  .content > .notice {
+    order: 3;
+  }
+
+  .content > .table-panel,
+  .content > .grid.two {
+    order: 4;
+  }
+
+  .content > .action-card {
+    order: 5;
+  }
+
+  .content > .elevated-form {
+    order: 6;
+  }
+}
+
 @media (max-width: 640px) {
   .global-header {
     padding: 14px 14px 12px;
@@ -1052,7 +1244,7 @@ button.primary,
 
   .content {
     padding-top: 22px;
-    gap: 22px;
+    gap: 18px;
   }
 
   .page-header h1 {
@@ -1065,14 +1257,35 @@ button.primary,
     padding: 16px;
   }
 
+  .hero-panel {
+    display: none;
+  }
+
   .metric-card {
-    min-height: 104px;
-    padding: 15px;
+    min-height: 92px;
+    padding: 13px;
   }
 
   .metric-card strong {
-    font-size: 24px;
+    margin-top: 10px;
+    font-size: 22px;
     overflow-wrap: anywhere;
+  }
+
+  .metric-card small {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .metric-topline {
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .metric-icon {
+    width: 26px;
+    height: 26px;
   }
 
   .form-panel input,
@@ -1114,5 +1327,26 @@ button.primary,
 
   .dx-datagrid {
     font-size: 12px;
+  }
+
+  .mobile-record-item {
+    padding: 14px 0;
+  }
+
+  .mobile-record-head {
+    gap: 10px;
+  }
+
+  .mobile-record-item h3 {
+    font-size: 16px;
+  }
+
+  .mobile-record-meta {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .mobile-record-actions > * {
+    flex: 1 1 0;
   }
 }

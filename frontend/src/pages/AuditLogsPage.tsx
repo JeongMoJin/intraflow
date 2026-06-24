@@ -3,11 +3,13 @@ import DataGrid, { Column, FilterRow, Paging, SearchPanel } from 'devextreme-rea
 import { LockKeyhole, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { PageHeader } from '../components/PageHeader';
 import { DataChip } from '../components/StatusBadge';
 import { useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { AuditLog } from '../types/api';
+import { formatDateTime } from '../utils/format';
 
 const copy: Record<Language, {
   title: string;
@@ -72,6 +74,7 @@ const copy: Record<Language, {
 export function AuditLogsPage() {
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyLogs = language === 'ko' ? '감사 로그가 없습니다.' : 'No audit logs.';
   const [logs, setLogs] = useState<AuditLog[]>([]);
 
   useEffect(() => {
@@ -97,18 +100,37 @@ export function AuditLogsPage() {
           <span className="eyebrow">{t.sectionEyebrow}</span>
           <h2>{t.sectionTitle}</h2>
         </div>
-        <DataGrid dataSource={logs} showBorders columnAutoWidth>
-          <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
-          <FilterRow visible />
-          <Paging defaultPageSize={15} />
-          <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
-          <Column dataField="action" caption={t.columns.action} cellRender={({ value }) => <DataChip value={value} />} />
-          <Column dataField="entityName" caption={t.columns.entity} cellRender={({ value }) => <DataChip value={value} />} />
-          <Column dataField="entityId" caption={t.columns.entityId} />
-          <Column dataField="userName" caption={t.columns.user} />
-          <Column dataField="ipAddress" caption={t.columns.ip} />
-          <Column dataField="afterValue" caption={t.columns.after} />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={logs} showBorders columnAutoWidth>
+            <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
+            <FilterRow visible />
+            <Paging defaultPageSize={15} />
+            <Column dataField="createdAt" caption={t.columns.created} dataType="datetime" />
+            <Column dataField="action" caption={t.columns.action} cellRender={({ value }) => <DataChip value={value} />} />
+            <Column dataField="entityName" caption={t.columns.entity} cellRender={({ value }) => <DataChip value={value} />} />
+            <Column dataField="entityId" caption={t.columns.entityId} />
+            <Column dataField="userName" caption={t.columns.user} />
+            <Column dataField="ipAddress" caption={t.columns.ip} />
+            <Column dataField="afterValue" caption={t.columns.after} />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyLogs}
+            items={logs.map((log) => ({
+              id: log.id,
+              eyebrow: <DataChip value={log.entityName} />,
+              title: log.action,
+              description: log.afterValue,
+              meta: [
+                { label: t.columns.user, value: log.userName },
+                { label: t.columns.entityId, value: log.entityId ?? '-' },
+                { label: t.columns.ip, value: log.ipAddress ?? '-' },
+                { label: t.columns.created, value: formatDateTime(log.createdAt, language) },
+              ],
+            }))}
+          />
+        </div>
       </section>
     </>
   );

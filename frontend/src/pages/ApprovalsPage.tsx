@@ -3,6 +3,7 @@ import DataGrid, { Column, FilterRow, Paging, SearchPanel } from 'devextreme-rea
 import { CheckCircle2, Clock3, XCircle } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { Notice } from '../components/Notice';
 import { PageHeader } from '../components/PageHeader';
 import { DataChip, StatusBadge } from '../components/StatusBadge';
@@ -10,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { translateApprovalType, useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { Approval } from '../types/api';
+import { formatMoney } from '../utils/format';
 
 const approvalTypes = ['Vacation', 'Expense', 'ProjectBudget'];
 
@@ -133,6 +135,7 @@ export function ApprovalsPage() {
   const auth = useAuth();
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyApprovals = language === 'ko' ? '결재 데이터가 없습니다.' : 'No approval records.';
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
@@ -213,35 +216,60 @@ export function ApprovalsPage() {
           <span className="eyebrow">{t.sectionEyebrow}</span>
           <h2>{t.sectionTitle}</h2>
         </div>
-        <DataGrid dataSource={approvals} showBorders columnAutoWidth>
-          <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
-          <FilterRow visible />
-          <Paging defaultPageSize={10} />
-          <Column dataField="approvalNo" caption={t.columns.no} />
-          <Column dataField="title" caption={t.columns.title} />
-          <Column dataField="type" caption={t.columns.type} cellRender={({ value }) => <DataChip value={translateApprovalType(value, language)} />} />
-          <Column dataField="requesterName" caption={t.columns.requester} />
-          <Column dataField="approverName" caption={t.columns.approver} />
-          <Column dataField="amount" caption={t.columns.amount} dataType="number" format="#,##0" />
-          <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-          {canApprove ? (
-            <Column
-              caption={t.columns.decision}
-              cellRender={({ data }) => {
-                const approval = data as Approval;
-                if (approval.status !== 'Pending') {
-                  return <span className="muted">{t.closed}</span>;
-                }
-                return (
-                  <div className="row-actions">
-                    <button className="ghost-button" type="button" onClick={() => approve(approval.id)}>{t.buttons.approve}</button>
-                    <button className="danger-button" type="button" onClick={() => reject(approval.id)}>{t.buttons.reject}</button>
-                  </div>
-                );
-              }}
-            />
-          ) : null}
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={approvals} showBorders columnAutoWidth>
+            <SearchPanel visible width={280} placeholder={t.searchPlaceholder} />
+            <FilterRow visible />
+            <Paging defaultPageSize={10} />
+            <Column dataField="approvalNo" caption={t.columns.no} />
+            <Column dataField="title" caption={t.columns.title} />
+            <Column dataField="type" caption={t.columns.type} cellRender={({ value }) => <DataChip value={translateApprovalType(value, language)} />} />
+            <Column dataField="requesterName" caption={t.columns.requester} />
+            <Column dataField="approverName" caption={t.columns.approver} />
+            <Column dataField="amount" caption={t.columns.amount} dataType="number" format="#,##0" />
+            <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+            {canApprove ? (
+              <Column
+                caption={t.columns.decision}
+                cellRender={({ data }) => {
+                  const approval = data as Approval;
+                  if (approval.status !== 'Pending') {
+                    return <span className="muted">{t.closed}</span>;
+                  }
+                  return (
+                    <div className="row-actions">
+                      <button className="ghost-button" type="button" onClick={() => approve(approval.id)}>{t.buttons.approve}</button>
+                      <button className="danger-button" type="button" onClick={() => reject(approval.id)}>{t.buttons.reject}</button>
+                    </div>
+                  );
+                }}
+              />
+            ) : null}
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyApprovals}
+            items={approvals.map((approval) => ({
+              id: approval.id,
+              eyebrow: approval.approvalNo,
+              title: approval.title,
+              status: <StatusBadge value={approval.status} />,
+              meta: [
+                { label: t.columns.type, value: <DataChip value={translateApprovalType(approval.type, language)} /> },
+                { label: t.columns.requester, value: approval.requesterName ?? '-' },
+                { label: t.columns.approver, value: approval.approverName ?? '-' },
+                { label: t.columns.amount, value: formatMoney(approval.amount, language) },
+              ],
+              actions: canApprove && approval.status === 'Pending' ? (
+                <>
+                  <button className="ghost-button" type="button" onClick={() => approve(approval.id)}>{t.buttons.approve}</button>
+                  <button className="danger-button" type="button" onClick={() => reject(approval.id)}>{t.buttons.reject}</button>
+                </>
+              ) : undefined,
+            }))}
+          />
+        </div>
       </section>
     </>
   );

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import DataGrid, { Column, Paging } from 'devextreme-react/data-grid';
 import { Shield, ShieldCheck, UserCheck } from 'lucide-react';
 import { endpoints } from '../api/client';
+import { MobileRecordList } from '../components/MobileViews';
 import { PageHeader } from '../components/PageHeader';
 import { RoleBadge } from '../components/StatusBadge';
 import { translateMenuName, useLanguage } from '../hooks/useLanguage';
@@ -128,13 +129,30 @@ export function RoleGuidePage() {
           <h2>{t.graphTitle}</h2>
           <p>{t.graphDescription}</p>
         </div>
-        <DataGrid dataSource={graphUsers} showBorders columnAutoWidth noDataText={t.graphRestricted}>
-          <Paging defaultPageSize={5} />
-          <Column dataField="displayName" caption={t.columns.displayName} />
-          <Column dataField="mail" caption={t.columns.mail} />
-          <Column dataField="department" caption={t.columns.department} />
-          <Column dataField="jobTitle" caption={t.columns.jobTitle} />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={graphUsers} showBorders columnAutoWidth noDataText={t.graphRestricted}>
+            <Paging defaultPageSize={5} />
+            <Column dataField="displayName" caption={t.columns.displayName} />
+            <Column dataField="mail" caption={t.columns.mail} />
+            <Column dataField="department" caption={t.columns.department} />
+            <Column dataField="jobTitle" caption={t.columns.jobTitle} />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={t.graphRestricted}
+            items={graphUsers.map((user) => ({
+              id: user.id,
+              eyebrow: user.department,
+              title: user.displayName,
+              description: user.mail,
+              meta: [
+                { label: t.columns.jobTitle, value: user.jobTitle },
+                { label: t.columns.department, value: user.department },
+              ],
+            }))}
+          />
+        </div>
       </section>
     </>
   );

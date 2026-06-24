@@ -3,12 +3,14 @@ import DataGrid, { Column, Paging } from 'devextreme-react/data-grid';
 import { DatabaseZap, RadioTower, ShieldAlert } from 'lucide-react';
 import { endpoints } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
+import { MobileRecordList } from '../components/MobileViews';
 import { Notice } from '../components/Notice';
 import { PageHeader } from '../components/PageHeader';
 import { DataChip, StatusBadge } from '../components/StatusBadge';
 import { translateStatus, useLanguage } from '../hooks/useLanguage';
 import type { Language } from '../hooks/useLanguage';
 import type { ErpSyncLog, ExternalErpRecord } from '../types/api';
+import { formatDateTime } from '../utils/format';
 
 const copy: Record<Language, {
   title: string;
@@ -99,6 +101,8 @@ const copy: Record<Language, {
 export function ErpSyncPage() {
   const { language } = useLanguage();
   const t = copy[language];
+  const emptyLogs = language === 'ko' ? '동기화 로그가 없습니다.' : 'No sync logs.';
+  const emptyRecords = language === 'ko' ? '동기화된 레코드가 없습니다.' : 'No synchronized records.';
   const [logs, setLogs] = useState<ErpSyncLog[]>([]);
   const [records, setRecords] = useState<ExternalErpRecord[]>([]);
   const [message, setMessage] = useState('');
@@ -158,29 +162,64 @@ export function ErpSyncPage() {
           <span className="eyebrow">{t.erpHealth}</span>
           <h2>{t.syncLogs}</h2>
         </div>
-        <DataGrid dataSource={logs} showBorders columnAutoWidth>
-          <Paging defaultPageSize={8} />
-          <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
-          <Column dataField="importedCount" caption={t.columns.imported} />
-          <Column dataField="failedCount" caption={t.columns.failed} />
-          <Column dataField="message" caption={t.columns.message} />
-          <Column dataField="triggeredBy" caption={t.columns.triggeredBy} />
-          <Column dataField="startedAt" caption={t.columns.started} dataType="datetime" />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={logs} showBorders columnAutoWidth>
+            <Paging defaultPageSize={8} />
+            <Column dataField="status" caption={t.columns.status} cellRender={({ value }) => <StatusBadge value={value} />} />
+            <Column dataField="importedCount" caption={t.columns.imported} />
+            <Column dataField="failedCount" caption={t.columns.failed} />
+            <Column dataField="message" caption={t.columns.message} />
+            <Column dataField="triggeredBy" caption={t.columns.triggeredBy} />
+            <Column dataField="startedAt" caption={t.columns.started} dataType="datetime" />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyLogs}
+            items={logs.map((log) => ({
+              id: log.id,
+              title: log.message,
+              status: <StatusBadge value={log.status} />,
+              meta: [
+                { label: t.columns.imported, value: log.importedCount },
+                { label: t.columns.failed, value: log.failedCount },
+                { label: t.columns.triggeredBy, value: log.triggeredBy },
+                { label: t.columns.started, value: formatDateTime(log.startedAt, language) },
+              ],
+            }))}
+          />
+        </div>
       </section>
       <section className="panel table-panel">
         <div className="section-title">
           <span className="eyebrow">{t.externalSource}</span>
           <h2>{t.synchronizedRecords}</h2>
         </div>
-        <DataGrid dataSource={records} showBorders columnAutoWidth>
-          <Paging defaultPageSize={8} />
-          <Column dataField="externalSystem" caption={t.columns.system} cellRender={({ value }) => <DataChip value={value} />} />
-          <Column dataField="externalId" caption={t.columns.externalId} />
-          <Column dataField="entityName" caption={t.columns.entity} />
-          <Column dataField="payloadJson" caption={t.columns.payload} />
-          <Column dataField="syncedAt" caption={t.columns.synced} dataType="datetime" />
-        </DataGrid>
+        <div className="desktop-data-grid">
+          <DataGrid dataSource={records} showBorders columnAutoWidth>
+            <Paging defaultPageSize={8} />
+            <Column dataField="externalSystem" caption={t.columns.system} cellRender={({ value }) => <DataChip value={value} />} />
+            <Column dataField="externalId" caption={t.columns.externalId} />
+            <Column dataField="entityName" caption={t.columns.entity} />
+            <Column dataField="payloadJson" caption={t.columns.payload} />
+            <Column dataField="syncedAt" caption={t.columns.synced} dataType="datetime" />
+          </DataGrid>
+        </div>
+        <div className="mobile-data-list">
+          <MobileRecordList
+            emptyText={emptyRecords}
+            items={records.map((record) => ({
+              id: record.id,
+              eyebrow: <DataChip value={record.externalSystem} />,
+              title: record.entityName,
+              description: record.payloadJson,
+              meta: [
+                { label: t.columns.externalId, value: record.externalId },
+                { label: t.columns.synced, value: formatDateTime(record.syncedAt, language) },
+              ],
+            }))}
+          />
+        </div>
       </section>
     </>
   );
