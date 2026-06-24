@@ -271,11 +271,20 @@ html[lang="ko"] .language-switch button {
   line-height: 1.55;
 }
 
-.career-layout,
+.career-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+
 .login-career-layout {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
   gap: 60px;
+}
+
+.console-main {
+  padding-top: 26px;
 }
 
 .category-rail {
@@ -352,7 +361,7 @@ html[lang="ko"] .language-switch button {
   justify-content: space-between;
   gap: 14px;
   border-bottom: 1px solid #111;
-  padding: 11px 10px;
+  padding: 0 0 13px;
   color: #666;
   font-size: 13px;
 }
@@ -1050,6 +1059,10 @@ button.primary,
   .career-main {
     width: min(100% - 28px, 1280px);
     padding: 28px 0 56px;
+  }
+
+  .console-main {
+    padding-top: 18px;
   }
 
   .job-title-block {
