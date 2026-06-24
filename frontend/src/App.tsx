@@ -117,7 +117,7 @@ function Shell() {
   const { language } = useLanguage();
   const t = shellCopy[language];
   const availablePages = useMemo(() => pages.filter((page) => auth.canAccess(page.key)), [auth]);
-  const [activePage, setActivePage] = useState<PageKey>(() => (auth.canAccess('dashboard') ? 'dashboard' : 'projects'));
+  const [activePage, setActivePage] = useState<PageKey>('dashboard');
 
   if (!auth.session) {
     return <LoginPage />;

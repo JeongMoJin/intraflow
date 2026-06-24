@@ -19,12 +19,17 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   background: #fff;
   color: var(--ink);
+  overflow-x: clip;
 }
 
 button,
@@ -362,6 +367,24 @@ html[lang="ko"] .language-switch button {
   padding-top: 28px;
   display: grid;
   gap: 28px;
+  min-width: 0;
+}
+
+.career-layout,
+.login-career-layout,
+.operations-board,
+.panel,
+.table-panel,
+.chart-panel,
+.dx-datagrid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.table-panel {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .page-header {
@@ -420,6 +443,14 @@ button:hover,
 .file-button:hover {
   border-color: #111;
   background: #f7f7f7;
+}
+
+button:focus-visible,
+.file-button:focus-within,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
 }
 
 button.primary,
@@ -802,38 +833,121 @@ button.primary,
 @media (max-width: 900px) {
   .global-header {
     height: auto;
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 18px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand user"
+      "nav nav";
+    gap: 12px 16px;
+    padding: 16px;
+  }
+
+  .wordmark {
+    grid-area: brand;
+    font-size: 27px;
+    letter-spacing: 0;
   }
 
   .global-nav {
+    grid-area: nav;
     justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    gap: 20px;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .global-nav::-webkit-scrollbar,
+  .category-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .global-nav button,
+  .global-nav span {
+    flex: 0 0 auto;
+    height: 34px;
+    font-size: 11px;
   }
 
   .header-user {
-    justify-content: flex-start;
+    grid-area: user;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+    font-size: 11px;
+  }
+
+  .logout-link {
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .language-switch button {
+    font-size: 11px;
+  }
+
+  .career-hero {
+    min-height: 220px;
+  }
+
+  .career-hero-copy {
+    padding: 0 18px;
+  }
+
+  .career-hero-copy span {
+    font-size: 18px;
+    text-wrap: balance;
+  }
+
+  .career-hero-copy strong {
+    margin-top: 16px;
+    font-size: 44px;
+    letter-spacing: 0;
   }
 
   .career-main {
     width: min(100% - 28px, 1280px);
+    padding: 28px 0 56px;
+  }
+
+  .job-title-block {
+    padding-bottom: 32px;
+  }
+
+  .job-title-block h1 {
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: 0;
   }
 
   .career-layout,
   .login-career-layout {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 22px;
   }
 
   .category-rail {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 18px;
+    margin: 0 -14px;
+    padding: 0 14px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .category-rail button {
+    flex: 0 0 auto;
     border-left: 0;
     border-bottom: 1px solid transparent;
-    padding: 8px 12px;
+    min-height: 34px;
+    padding: 8px 0;
+    white-space: nowrap;
   }
 
   .category-rail button.active {
@@ -847,6 +961,19 @@ button.primary,
   .action-card {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .board-heading {
+    padding: 0 0 12px;
+  }
+
+  .board-meta {
+    text-align: left;
+  }
+
+  .system-strip {
+    padding: 12px 0;
+    gap: 9px;
   }
 
   .metrics,
@@ -866,5 +993,126 @@ button.primary,
     padding: 10px 18px;
     border-right: 0;
     border-bottom: 1px solid #e6e6e6;
+  }
+
+  .table-panel .dx-datagrid {
+    min-width: 640px;
+  }
+}
+
+@media (max-width: 640px) {
+  .global-header {
+    padding: 14px 14px 12px;
+    gap: 10px 12px;
+  }
+
+  .wordmark {
+    font-size: 26px;
+  }
+
+  .header-user > span:first-child {
+    max-width: 86px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .global-nav {
+    gap: 18px;
+  }
+
+  .career-hero {
+    min-height: 172px;
+  }
+
+  .career-hero-copy span {
+    font-size: 16px;
+  }
+
+  .career-hero-copy strong {
+    font-size: 38px;
+  }
+
+  .career-main {
+    width: calc(100% - 28px);
+    padding: 24px 0 44px;
+  }
+
+  .job-title-block h1 {
+    font-size: 28px;
+  }
+
+  .job-title-block p,
+  .board-heading p,
+  .page-header p,
+  .section-title p,
+  .role-card p,
+  .action-card p {
+    font-size: 14px;
+  }
+
+  .content {
+    padding-top: 22px;
+    gap: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 26px;
+    line-height: 1.15;
+    letter-spacing: 0;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .metric-card {
+    min-height: 104px;
+    padding: 15px;
+  }
+
+  .metric-card strong {
+    font-size: 24px;
+    overflow-wrap: anywhere;
+  }
+
+  .form-panel input,
+  .form-panel select,
+  .form-panel button,
+  .login-form-grid input,
+  .login-form-grid button,
+  .page-actions > *,
+  .row-actions > * {
+    width: 100%;
+  }
+
+  .row-actions {
+    flex-direction: column;
+  }
+
+  .action-card {
+    padding: 16px;
+  }
+
+  .role-card-head {
+    align-items: flex-start;
+  }
+
+  .position-row strong,
+  .position-row p {
+    padding: 12px 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .secure-note {
+    align-items: flex-start;
+    padding: 12px 14px;
+  }
+
+  .table-panel {
+    padding-bottom: 12px;
+  }
+
+  .dx-datagrid {
+    font-size: 12px;
   }
 }
