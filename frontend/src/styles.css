@@ -245,91 +245,6 @@ html[lang="ko"] .language-switch button {
   letter-spacing: -0.055em;
 }
 
-.console-banner {
-  width: min(1280px, calc(100% - 56px));
-  min-height: 184px;
-  margin: 24px auto 0;
-  padding: 28px clamp(24px, 4vw, 48px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 240px);
-  align-items: center;
-  gap: 24px;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(90deg, rgba(10, 12, 14, 0.98), rgba(20, 23, 27, 0.88)),
-    repeating-linear-gradient(135deg, #111417 0 22px, #171a1e 22px 23px);
-  color: #fff;
-}
-
-.console-banner::before {
-  content: "";
-  position: absolute;
-  inset: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  pointer-events: none;
-}
-
-.console-banner::after {
-  content: "";
-  position: absolute;
-  right: 14%;
-  top: -42%;
-  width: 260px;
-  height: 260px;
-  background: rgba(255, 255, 255, 0.08);
-  transform: rotate(38deg);
-}
-
-.console-banner-copy {
-  position: relative;
-  z-index: 1;
-  max-width: 720px;
-}
-
-.console-banner-copy span {
-  display: block;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
-
-.console-banner-copy strong {
-  display: block;
-  margin-top: 12px;
-  color: #fff;
-  font-size: clamp(28px, 3vw, 42px);
-  font-weight: 500;
-  line-height: 1.12;
-  text-wrap: balance;
-  word-break: keep-all;
-}
-
-.console-banner-copy p {
-  max-width: 640px;
-  margin: 14px 0 0;
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 15px;
-  line-height: 1.6;
-  text-wrap: pretty;
-  word-break: keep-all;
-}
-
-.console-banner-visual {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  justify-items: end;
-}
-
-.console-banner-visual img {
-  width: min(210px, 100%);
-  height: auto;
-  filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.42));
-}
-
 .career-main {
   width: min(1280px, calc(100% - 56px));
   margin: 0 auto;
@@ -1141,45 +1056,6 @@ button.primary,
     letter-spacing: 0;
   }
 
-  .console-banner {
-    width: min(100% - 28px, 1280px);
-    min-height: 158px;
-    margin-top: 18px;
-    padding: 22px;
-    grid-template-columns: minmax(0, 1fr) 132px;
-    gap: 14px;
-  }
-
-  .console-banner::before {
-    inset: 10px;
-  }
-
-  .console-banner::after {
-    right: -26px;
-    top: -96px;
-  }
-
-  .console-banner-copy span {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-  }
-
-  .console-banner-copy strong {
-    margin-top: 9px;
-    font-size: 26px;
-    line-height: 1.18;
-  }
-
-  .console-banner-copy p {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .console-banner-visual img {
-    width: 126px;
-  }
-
   .career-main {
     width: min(100% - 28px, 1280px);
     padding: 28px 0 56px;
@@ -1359,25 +1235,6 @@ button.primary,
 
   .career-hero-copy strong {
     font-size: 38px;
-  }
-
-  .console-banner {
-    min-height: 136px;
-    grid-template-columns: minmax(0, 1fr) 82px;
-    gap: 8px;
-    padding: 18px;
-  }
-
-  .console-banner-copy strong {
-    font-size: 22px;
-  }
-
-  .console-banner-copy p {
-    display: none;
-  }
-
-  .console-banner-visual img {
-    width: 86px;
   }
 
   .career-main {
