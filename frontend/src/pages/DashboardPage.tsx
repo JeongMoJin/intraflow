@@ -13,10 +13,6 @@ import type { DashboardSummary } from '../types/api';
 import { formatDateTime } from '../utils/format';
 
 const copy: Record<Language, {
-  heroEyebrow: string;
-  heroTitle: string;
-  heroDescription: string;
-  heroMode: string;
   title: string;
   description: string;
   metrics: {
@@ -39,10 +35,6 @@ const copy: Record<Language, {
   columns: Record<string, string>;
 }> = {
   ko: {
-    heroEyebrow: '운영 시뮬레이션',
-    heroTitle: '운영 현황',
-    heroDescription: '아트테크 비즈니스 운영을 가정한 사내 인트라넷 대시보드입니다.',
-    heroMode: '운영 시뮬레이션 모드',
     title: '운영 대시보드',
     description: '직원, 프로젝트, 전자결재, ERP 동기화, 감사 로그를 하나의 내부 콘솔에서 확인합니다.',
     metrics: {
@@ -74,10 +66,6 @@ const copy: Record<Language, {
     },
   },
   en: {
-    heroEyebrow: 'Production Simulation',
-    heroTitle: 'Operations Overview',
-    heroDescription: 'Live intranet simulation for art-tech business operations.',
-    heroMode: 'Live Operations Mode',
     title: 'Operations Dashboard',
     description: 'Monitor people, projects, approvals, ERP sync, and audit readiness from one internal console.',
     metrics: {
@@ -121,7 +109,6 @@ export function DashboardPage() {
 
   const lastSync = summary?.recentErpSyncs[0];
   const auditEvents = summary?.recentAuditLogs.length ?? 0;
-  const today = useMemo(() => new Intl.DateTimeFormat(language === 'ko' ? 'ko-KR' : 'en', { dateStyle: 'medium' }).format(new Date()), [language]);
   const approvalChart = useMemo(
     () => (summary?.approvalsByStatus ?? []).map((item) => ({ ...item, label: translateStatus(item.label, language) })),
     [language, summary?.approvalsByStatus],
@@ -130,18 +117,6 @@ export function DashboardPage() {
 
   return (
     <>
-      <section className="hero-panel">
-        <div>
-          <span className="eyebrow">{t.heroEyebrow}</span>
-          <h1>{t.heroTitle}</h1>
-          <p>{t.heroDescription}</p>
-        </div>
-        <div className="hero-meta">
-          <span>{today}</span>
-          <strong>{t.heroMode}</strong>
-        </div>
-      </section>
-
       <PageHeader title={t.title} description={t.description} />
 
       <div className="metrics five">
